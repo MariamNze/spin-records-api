@@ -64,7 +64,7 @@ public class ProductDao {
         }
     }
 
-    public Product save(Product product) {
+    public Product create(Product product) {
         try {
             String sql = "INSERT INTO " + tableName + " (title, artist, genre, release_year, label, price, stock, cover_url, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             jdbcTemplate.update(sql,
@@ -83,7 +83,7 @@ public class ProductDao {
             product.setId(id);
             return product;
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la sauvegarde du produit : " + product.getTitle(), e);
+            throw new TechnicalDatabaseException("Erreur lors de la création du produit : " + product.getTitle(), e);
         }
     }
 
