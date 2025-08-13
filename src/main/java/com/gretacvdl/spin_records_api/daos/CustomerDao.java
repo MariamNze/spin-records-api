@@ -39,18 +39,6 @@ public class CustomerDao {
         }
     }
 
-    public Customer findById(Long id) {
-        try {
-            String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
-            return jdbcTemplate.query(sql, customerRowMapper, id)
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new CustomerNotFoundException("Le client avec l'ID " + id + " n'existe pas"));
-        } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
-        }
-    }
-
     public Customer findByEmail(String email) {
         try {
             String sql = "SELECT * FROM " + tableName + " WHERE email = ?";
@@ -83,42 +71,32 @@ public class CustomerDao {
         }
     }
 
-    public Customer update(Long id, Customer customer) {
+    public Customer update(String email, Customer customer) {
         try {
-            if (!customerExists(id)) {
-                throw new CustomerNotFoundException("Client avec l'ID " + id + " n'existe pas");
+            if (!customerExists(email)) {
+                throw new CustomerNotFoundException("Client avec l'email " + email + " n'existe pas");
             }
-            String sql = "UPDATE " + tableName + " SET email = ?, name = ? WHERE id = ?";
+            String sql = "UPDATE " + tableName + " SET email = ?, name = ? WHERE email = ?";
             int rowsAffected = jdbcTemplate.update(sql,
                     customer.getEmail(),
                     customer.getName(),
-                    id);
+                    email);
             if (rowsAffected <= 0) {
-                throw new TechnicalDatabaseException("Aucune ligne mise à jour pour le client avec l'ID " + id);
+                throw new TechnicalDatabaseException("Aucune ligne mise à jour pour le client avec l'email " + email);
             }
-            return this.findById(id);
+            return this.findByEmail(email);
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la mise à jour du client avec l'ID " + id, e);
+            throw new TechnicalDatabaseException("Erreur lors de la mise à jour du client avec l'email " + email, e);
         }
     }
 
-    public boolean delete(Long id) {
+    private boolean customerExists(String email) {
         try {
-            String sql = "DELETE FROM " + tableName + " WHERE id = ?";
-            int rowsAffected = jdbcTemplate.update(sql, id);
-            return rowsAffected > 0;
-        } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la suppression du client avec l'ID " + id, e);
-        }
-    }
-
-    private boolean customerExists(Long id) {
-        try {
-            String checkSql = "SELECT COUNT(*) FROM " + tableName + " WHERE id = ?";
-            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, id);
+            String checkSql = "SELECT COUNT(*) FROM " + tableName + " WHERE email = ?";
+            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, email);
             return count != null && count > 0;
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la vérification de l'existence du client avec l'ID " + id, e);
+            throw new TechnicalDatabaseException("Erreur lors de la vérification de l'existence du client avec l'email " + email, e);
         }
     }
 }
