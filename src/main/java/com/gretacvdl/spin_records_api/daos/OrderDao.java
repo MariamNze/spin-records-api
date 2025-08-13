@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -31,7 +35,7 @@ public class OrderDao {
             String sql = "SELECT * FROM " + tableName;
             return jdbcTemplate.query(sql, orderRowMapper);
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur technique lors de la récupération des commandes : " + e.getMessage(), e);
+            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
         }
     }
 
@@ -59,12 +63,16 @@ public class OrderDao {
     public Order create(Order order) {
         try {
             String sql = "INSERT INTO " + tableName + " (customer_id, total) VALUES (?, ?)";
-            jdbcTemplate.update(sql,
-                    order.getCustomerId(),
-                    order.getTotal()
-            );
-            String sqlGetId = "SELECT LAST_INSERT_ID()";
-            Long id = jdbcTemplate.queryForObject(sqlGetId, Long.class);
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connexion -> {
+                PreparedStatement ps = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, order.getCustomerId());
+                ps.setBigDecimal(2, order.getTotal());
+                return ps;
+            }, keyHolder);
+
+            Long id = keyHolder.getKey().longValue();
             order.setId(id);
             return order;
         } catch (DataAccessException e) {
