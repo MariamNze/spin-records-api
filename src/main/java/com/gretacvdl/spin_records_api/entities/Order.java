@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,5 +17,5 @@ public class Order {
     private Long id;
     private Long customerId;
     private BigDecimal total;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 }

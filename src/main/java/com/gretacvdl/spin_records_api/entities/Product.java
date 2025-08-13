@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,5 +24,5 @@ public class Product {
     private Integer stock;
     private String coverUrl;
     private String description;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 }

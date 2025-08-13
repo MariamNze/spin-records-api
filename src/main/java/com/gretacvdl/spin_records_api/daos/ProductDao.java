@@ -34,7 +34,7 @@ public class ProductDao {
             rs.getInt("stock"),
             rs.getString("cover_url"),
             rs.getString("description"),
-            rs.getTimestamp("created_at")
+            rs.getTimestamp("created_at").toLocalDateTime()
     );
 
     public List<Product> findAll() {

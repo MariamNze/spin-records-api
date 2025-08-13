@@ -27,7 +27,7 @@ public class CustomerDao {
             rs.getLong("id"),
             rs.getString("email"),
             rs.getString("name"),
-            rs.getTimestamp("created_at")
+            rs.getTimestamp("created_at").toLocalDateTime()
     );
 
     public List<Customer> findAll() {

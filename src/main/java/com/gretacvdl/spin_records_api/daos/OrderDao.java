@@ -27,7 +27,7 @@ public class OrderDao {
             rs.getLong("id"),
             rs.getLong("customer_id"),
             rs.getBigDecimal("total"),
-            rs.getTimestamp("created_at")
+            rs.getTimestamp("created_at").toLocalDateTime()
     );
 
     public List<Order> findAll() {
