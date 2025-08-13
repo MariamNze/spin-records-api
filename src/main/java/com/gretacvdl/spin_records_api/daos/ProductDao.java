@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -67,19 +71,23 @@ public class ProductDao {
     public Product create(Product product) {
         try {
             String sql = "INSERT INTO " + tableName + " (title, artist, genre, release_year, label, price, stock, cover_url, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            jdbcTemplate.update(sql,
-                    product.getTitle(),
-                    product.getArtist(),
-                    product.getGenre(),
-                    product.getReleaseYear(),
-                    product.getLabel(),
-                    product.getPrice(),
-                    product.getStock(),
-                    product.getCoverUrl(),
-                    product.getDescription()
-            );
-            String sqlGetId = "SELECT LAST_INSERT_ID()";
-            Long id = jdbcTemplate.queryForObject(sqlGetId, Long.class);
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connexion -> {
+                PreparedStatement ps = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, product.getTitle());
+                ps.setString(2, product.getArtist());
+                ps.setString(3, product.getGenre());
+                ps.setInt(4, product.getReleaseYear());
+                ps.setString(5, product.getLabel());
+                ps.setBigDecimal(6, product.getPrice());
+                ps.setInt(7, product.getStock());
+                ps.setString(8, product.getCoverUrl());
+                ps.setString(9, product.getDescription());
+                return ps;
+            }, keyHolder);
+
+            Long id = keyHolder.getKey().longValue();
             product.setId(id);
             return product;
         } catch (DataAccessException e) {
