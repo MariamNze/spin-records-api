@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -62,12 +66,16 @@ public class CustomerDao {
     public Customer create(Customer customer) {
         try {
             String sql = "INSERT INTO " + tableName + " (email, name) VALUES (?, ?)";
-            jdbcTemplate.update(sql,
-                    customer.getEmail(),
-                    customer.getName()
-            );
-            String sqlGetId = "SELECT LAST_INSERT_ID()";
-            Long id = jdbcTemplate.queryForObject(sqlGetId, Long.class);
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connexion -> {
+                PreparedStatement ps = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, customer.getEmail());
+                ps.setString(2, customer.getName());
+                return ps;
+            }, keyHolder);
+
+            Long id = keyHolder.getKey().longValue();
             customer.setId(id);
             return customer;
         } catch (DataAccessException e) {
@@ -110,7 +118,7 @@ public class CustomerDao {
             Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, id);
             return count != null && count > 0;
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la vérification de l'existence du produit avec l'ID " + id, e);
+            throw new TechnicalDatabaseException("Erreur lors de la vérification de l'existence du client avec l'ID " + id, e);
         }
     }
 }
