@@ -51,10 +51,15 @@ public class OrderDao {
         }
     }
 
-    public List<Order> findByCustomerId(Long customerId) {
+    public List<Order> findByCustomerEmail(String email) {
         try {
-            String sql = "SELECT * FROM " + tableName + " WHERE customer_id = ? ORDER BY created_at DESC";
-            return jdbcTemplate.query(sql, orderRowMapper, customerId);
+            String sql = """
+            SELECT o.* FROM orders o
+            JOIN customer c ON o.customer_id = c.id
+            WHERE c.email = ?
+            ORDER BY o.created_at DESC
+            """;
+            return jdbcTemplate.query(sql, orderRowMapper, email);
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
         }
