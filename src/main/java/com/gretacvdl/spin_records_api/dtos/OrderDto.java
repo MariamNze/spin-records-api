@@ -1,4 +1,4 @@
-package com.gretacvdl.spin_records_api.entities;
+package com.gretacvdl.spin_records_api.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,20 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Order {
+public class OrderDto {
 
     private Long id;
     private Long customerId;
+    private String customerEmail;
     private BigDecimal total;
     private LocalDateTime createdAt;
-
-    public List<OrderItem> items;
-
-    // Constructor used by OrderDao
-    public Order(Long id, Long customerId, BigDecimal total, LocalDateTime createdAt) {
-        this.id = id;
-        this.customerId = customerId;
-        this.total = total;
-        this.createdAt = createdAt;
-    }
+    private List<OrderItemDto> items;
 }
