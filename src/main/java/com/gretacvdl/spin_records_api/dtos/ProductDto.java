@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 public class ProductDto {
 
+    private Long id;
     private String title;
     private String artist;
     private String genre;
