@@ -3,7 +3,6 @@ package com.gretacvdl.spin_records_api.daos;
 import com.gretacvdl.spin_records_api.entities.OrderItem;
 import com.gretacvdl.spin_records_api.exceptions.OrderItemNotFoundException;
 import com.gretacvdl.spin_records_api.exceptions.TechnicalDatabaseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,8 +17,11 @@ import java.util.List;
 @Repository
 public class OrderItemDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+
+    public OrderItemDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private final String tableName = "order_item";
 

@@ -1,22 +1,21 @@
 package com.gretacvdl.spin_records_api.dtos;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class OrderItemDto {
+public class CartItemDto {
 
-    private Long id;
-    private Long orderId;
+    @NotNull
     private Long productId;
-    private Integer quantity;
-    private BigDecimal unitPrice;
-    private String productTitle;
+
+    @Min(value = 1, message = "La quantité minimale : 1")
+    private int quantity;
 }

@@ -3,7 +3,6 @@ package com.gretacvdl.spin_records_api.daos;
 import com.gretacvdl.spin_records_api.entities.Customer;
 import com.gretacvdl.spin_records_api.exceptions.CustomerNotFoundException;
 import com.gretacvdl.spin_records_api.exceptions.TechnicalDatabaseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,8 +17,11 @@ import java.util.List;
 @Repository
 public class CustomerDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+
+    public CustomerDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private final String tableName = "customer";
 
@@ -34,6 +36,18 @@ public class CustomerDao {
         try {
             String sql = "SELECT * FROM " + tableName;
             return jdbcTemplate.query(sql, customerRowMapper);
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
+        }
+    }
+
+    public Customer findById(Long id) {
+        try {
+            String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
+            return jdbcTemplate.query(sql, customerRowMapper, id)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new CustomerNotFoundException("Le client avec l'ID " + id + " n'existe pas"));
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
         }
@@ -87,6 +101,16 @@ public class CustomerDao {
             return this.findByEmail(email);
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur lors de la mise à jour du client avec l'email " + email, e);
+        }
+    }
+
+    public boolean delete(Long id) {
+        try {
+            String sql = "DELETE FROM " + tableName + " WHERE id = ?";
+            int rowsAffected = jdbcTemplate.update(sql, id);
+            return rowsAffected > 0;
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur lors de la suppression du client avec l'ID " + id, e);
         }
     }
 

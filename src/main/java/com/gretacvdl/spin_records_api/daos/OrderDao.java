@@ -1,9 +1,10 @@
 package com.gretacvdl.spin_records_api.daos;
 
+import com.gretacvdl.spin_records_api.dtos.OrderItemDto;
 import com.gretacvdl.spin_records_api.entities.Order;
+import com.gretacvdl.spin_records_api.entities.OrderItem;
 import com.gretacvdl.spin_records_api.exceptions.OrderNotFoundException;
 import com.gretacvdl.spin_records_api.exceptions.TechnicalDatabaseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,8 +19,11 @@ import java.util.List;
 @Repository
 public class OrderDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+
+    public OrderDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private final String tableName = "orders";
 
@@ -28,6 +32,14 @@ public class OrderDao {
             rs.getLong("customer_id"),
             rs.getBigDecimal("total"),
             rs.getTimestamp("created_at").toLocalDateTime()
+    );
+
+    private final RowMapper<OrderItem> itemRowMapper = (rs, rowNum) -> new OrderItem(
+            rs.getLong("id"),
+            rs.getLong("order_id"),
+            rs.getLong("product_id"),
+            rs.getInt("quantity"),
+            rs.getBigDecimal("unit_price")
     );
 
     public List<Order> findAll() {
@@ -54,14 +66,41 @@ public class OrderDao {
     public List<Order> findByCustomerEmail(String email) {
         try {
             String sql = """
-            SELECT o.* FROM orders o
-            JOIN customer c ON o.customer_id = c.id
-            WHERE c.email = ?
-            ORDER BY o.created_at DESC
-            """;
+                    SELECT o.* FROM orders o
+                    JOIN customer c ON o.customer_id = c.id
+                    WHERE c.email = ?
+                    ORDER BY o.created_at DESC
+                    """;
             return jdbcTemplate.query(sql, orderRowMapper, email);
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
+        }
+    }
+
+    public List<OrderItem> findItems(Long orderId) {
+        try {
+            String sql = """
+                    SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.unit_price
+                    FROM order_item oi
+                    WHERE oi.order_id = ?
+                    """;
+            return jdbcTemplate.query(sql, itemRowMapper, orderId);
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage(), e);
+        }
+    }
+
+    public List<OrderItem> findItemsWithProductTitle(Long orderId) {
+        try {
+            String sql = """
+                    SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.unit_price
+                    FROM order_item oi
+                    JOIN product p ON oi.product_id = p.id
+                    WHERE oi.order_id = ?
+                    """;
+            return jdbcTemplate.query(sql, itemRowMapper, orderId);
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage(), e);
         }
     }
 

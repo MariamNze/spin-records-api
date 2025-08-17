@@ -16,7 +16,6 @@ import java.util.List;
 public class OrderDto {
 
     private Long id;
-    private Long customerId;
     private String customerEmail;
     private BigDecimal total;
     private LocalDateTime createdAt;
