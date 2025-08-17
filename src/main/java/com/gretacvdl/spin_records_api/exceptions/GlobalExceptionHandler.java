@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<String> handleOutOfStockException(OutOfStockException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(TechnicalDatabaseException.class)
     public ResponseEntity<String> handleDatabaseError(TechnicalDatabaseException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur technique : " + e.getMessage());
@@ -37,5 +42,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<String> handleNotFoundError(NoHandlerFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erreur 404 : Pas de endpoint disponible" + e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erreur inconnue : " + e.getMessage());
     }
 }
