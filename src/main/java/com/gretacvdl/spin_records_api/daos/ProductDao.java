@@ -1,9 +1,9 @@
 package com.gretacvdl.spin_records_api.daos;
 
 import com.gretacvdl.spin_records_api.entities.Product;
+import com.gretacvdl.spin_records_api.exceptions.OutOfStockException;
 import com.gretacvdl.spin_records_api.exceptions.ProductNotFoundException;
 import com.gretacvdl.spin_records_api.exceptions.TechnicalDatabaseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,8 +18,12 @@ import java.util.List;
 @Repository
 public class ProductDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public ProductDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private final String tableName = "product";
 
@@ -128,6 +132,30 @@ public class ProductDao {
             return rowsAffected > 0;
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur lors de la suppression du produit avec l'ID " + id, e);
+        }
+    }
+
+    public int getStock(Long id) {
+        try {
+            String sql = "SELECT stock FROM " + tableName + " WHERE id = ?";
+            Integer stock = jdbcTemplate.queryForObject(sql, Integer.class, id);
+            if (stock == null) throw new ProductNotFoundException("Le produit avec l'ID " + id + " est introuvable");
+            return stock;
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur lors de la récupération du stock du produit avec l'ID " + id, e);
+        }
+    }
+
+    public void decreaseStock(Long id, Integer quantity) {
+        try {
+            String sql = "UPDATE " + tableName + " SET stock = stock - ? WHERE id = ? AND stock >= ?";
+            int rowsAffected = jdbcTemplate.update(sql, quantity, id, quantity);
+            if (rowsAffected == 0) {
+                throw new OutOfStockException("Stock insuffisant ou produit avec l'ID " + id + " est introuvable");
+            }
+        } catch (DataAccessException e) {
+            throw new TechnicalDatabaseException("Erreur lors de la baisse du stock pour le produit avec l'ID " + id, e);
+
         }
     }
 
