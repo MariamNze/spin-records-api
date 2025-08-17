@@ -42,9 +42,7 @@ public class CustomerController {
 
     @DeleteMapping("/email/{email}")
     public ResponseEntity<Void> delete(@PathVariable String email) {
-        if (customerService.delete(email)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        customerService.delete(email);
+        return ResponseEntity.noContent().build();
     }
 }

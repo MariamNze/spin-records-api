@@ -3,6 +3,7 @@ package com.gretacvdl.spin_records_api.services;
 import com.gretacvdl.spin_records_api.daos.CustomerDao;
 import com.gretacvdl.spin_records_api.dtos.CustomerDto;
 import com.gretacvdl.spin_records_api.entities.Customer;
+import com.gretacvdl.spin_records_api.exceptions.CustomerNotFoundException;
 import com.gretacvdl.spin_records_api.mappers.CustomerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,10 @@ public class CustomerService {
         return CustomerMapper.toDto(updated);
     }
 
-    public boolean delete(String email) {
-        return customerDao.delete(email);
+    public void delete(String email) {
+        boolean deleted = customerDao.delete(email);
+        if (!deleted) {
+            throw new CustomerNotFoundException("Client avec l'email " + email + " introuvable.");
+        }
     }
 }

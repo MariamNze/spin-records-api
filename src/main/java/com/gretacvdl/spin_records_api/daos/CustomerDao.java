@@ -104,13 +104,13 @@ public class CustomerDao {
         }
     }
 
-    public boolean delete(Long id) {
+    public boolean delete(String email) {
         try {
-            String sql = "DELETE FROM " + tableName + " WHERE id = ?";
-            int rowsAffected = jdbcTemplate.update(sql, id);
+            String sql = "DELETE FROM " + tableName + " WHERE email = ?";
+            int rowsAffected = jdbcTemplate.update(sql, email);
             return rowsAffected > 0;
         } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur lors de la suppression du client avec l'ID " + id, e);
+            throw new TechnicalDatabaseException("Erreur lors de la suppression du client avec l'email " + email, e);
         }
     }
 
