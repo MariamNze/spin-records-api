@@ -1,6 +1,5 @@
 package com.gretacvdl.spin_records_api.daos;
 
-import com.gretacvdl.spin_records_api.dtos.OrderItemDto;
 import com.gretacvdl.spin_records_api.entities.Order;
 import com.gretacvdl.spin_records_api.entities.OrderItem;
 import com.gretacvdl.spin_records_api.exceptions.OrderNotFoundException;

@@ -2,6 +2,7 @@ package com.gretacvdl.spin_records_api.controllers;
 
 import com.gretacvdl.spin_records_api.dtos.ProductDto;
 import com.gretacvdl.spin_records_api.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDto> create(@RequestBody ProductDto dto) {
+    public ResponseEntity<ProductDto> create(@RequestBody @Valid ProductDto dto) {
         return ResponseEntity.ok(productService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> update(@PathVariable Long id, @RequestBody ProductDto dto) {
+    public ResponseEntity<ProductDto> update(@PathVariable Long id, @RequestBody @Valid ProductDto dto) {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 

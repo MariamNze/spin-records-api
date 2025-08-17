@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class CartItemDto {
 
-    @NotNull
+    @NotNull(message = "L'identifiant du produit est obligatoire")
     private Long productId;
 
     @Min(value = 1, message = "La quantité minimale : 1")

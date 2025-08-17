@@ -102,7 +102,7 @@ public class OrderService {
                 itemDto.add(new OrderItemDto(oi.getId(), oi.getOrderId(), oi.getProductId(), oi.getQuantity(), oi.getUnitPrice(), productTitle));
             }
 
-            Customer customer = customerDao.findByEmail(email);
+            Customer customer = customerDao.findById(order.getCustomerId());
             result.add(OrderMapper.toDto(order, customer.getEmail(), itemDto));
         }
         return result;
@@ -132,7 +132,7 @@ public class OrderService {
             }
 
             Customer customer = customerDao.findById(order.getCustomerId());
-            String email = customer != null ? customer.getEmail() : "client inconnu";
+            String email = customer != null ? customer.getEmail() : "Client inconnu";
 
             result.add(OrderMapper.toDto(order, email, itemDtos));
         }

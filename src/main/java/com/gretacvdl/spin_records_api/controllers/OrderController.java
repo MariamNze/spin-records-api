@@ -3,6 +3,7 @@ package com.gretacvdl.spin_records_api.controllers;
 import com.gretacvdl.spin_records_api.dtos.CartRequestDto;
 import com.gretacvdl.spin_records_api.dtos.OrderDto;
 import com.gretacvdl.spin_records_api.services.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/cart")
-    public ResponseEntity<OrderDto> createOrderFromCart(@RequestBody CartRequestDto req) {
+    public ResponseEntity<OrderDto> createOrderFromCart(@RequestBody @Valid CartRequestDto req) {
         return ResponseEntity.ok(orderService.cart(req));
     }
 
@@ -27,7 +28,7 @@ public class OrderController {
     }
 
     @GetMapping("/admin/orders")
-    public List<OrderDto> getAllOrders() {
-        return orderService.listAll();
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
+        return ResponseEntity.ok(orderService.listAll());
     }
 }
