@@ -17,8 +17,8 @@ public class ProductService {
     @Autowired
     private ProductDao productDao;
 
-    public List<ProductDto> findAll() {
-        return productDao.findAll().stream()
+    public List<ProductDto> findAll(String s) {
+        return productDao.findAll(s).stream()
                 .map(ProductMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -46,7 +46,10 @@ public class ProductService {
         return ProductMapper.toDto(updated);
     }
 
-    public boolean delete(Long id) {
-        return productDao.delete(id);
+    public void delete(Long id) {
+        boolean deleted = productDao.delete(id);
+        if (!deleted) {
+            throw new ProductNotFoundException("Impossible de supprimer : produit avec l'ID " + id + " est introuvable.");
+        }
     }
 }

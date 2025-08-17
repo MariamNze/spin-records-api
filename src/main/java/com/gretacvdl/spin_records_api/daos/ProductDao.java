@@ -4,6 +4,7 @@ import com.gretacvdl.spin_records_api.entities.Product;
 import com.gretacvdl.spin_records_api.exceptions.OutOfStockException;
 import com.gretacvdl.spin_records_api.exceptions.ProductNotFoundException;
 import com.gretacvdl.spin_records_api.exceptions.TechnicalDatabaseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,11 +20,8 @@ import java.util.List;
 public class ProductDao {
 
 
-    private final JdbcTemplate jdbcTemplate;
-
-    public ProductDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private final String tableName = "product";
 
@@ -41,10 +39,11 @@ public class ProductDao {
             rs.getTimestamp("created_at").toLocalDateTime()
     );
 
-    public List<Product> findAll() {
+    public List<Product> findAll(String s) {
         try {
-            String sql = "SELECT * FROM " + tableName;
-            return jdbcTemplate.query(sql, productRowMapper);
+            String sql = "SELECT * FROM " + tableName + " WHERE LOWER(title) LIKE ? OR LOWER(artist) LIKE ? ORDER BY title";
+            String search = (s != null && !s.isBlank()) ? "%" + s.trim().toLowerCase() + "%" : "%";
+            return jdbcTemplate.query(sql, productRowMapper, search, search);
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
         }
@@ -57,16 +56,6 @@ public class ProductDao {
                     .stream()
                     .findFirst()
                     .orElseThrow(() -> new ProductNotFoundException("Le produit avec l'ID " + id + " n'existe pas"));
-        } catch (DataAccessException e) {
-            throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
-        }
-    }
-
-    public List<Product> searchByTitleOrArtist(String keyword) {
-        try {
-            String sql = "SELECT * FROM " + tableName + " WHERE LOWER(title) LIKE ? OR LOWER(artist) LIKE ? ORDER BY title";
-            String kw = "%" + keyword.toLowerCase() + "%";
-            return jdbcTemplate.query(sql, productRowMapper, kw, kw);
         } catch (DataAccessException e) {
             throw new TechnicalDatabaseException("Erreur technique : " + e.getMessage());
         }
