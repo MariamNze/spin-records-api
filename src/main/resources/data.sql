@@ -4,7 +4,7 @@ INSERT INTO product (title, artist, genre, release_year, label, price, stock, co
 'https://upload.wikimedia.org/wikipedia/en/4/4d/Queen_A_Night_At_The_Opera.png',
 'Sorti en 1975, cet album marque un tournant dans la carrière de Queen. Mélange de rock progressif, de ballades et d’opéra rock, il inclut le célèbre "Bohemian Rhapsody".'),
 
-('The Miseducation of Lauryn Hill', 'Lauryn Hill', 'Neo-Soul', 1998, 'Ruffhouse', 30.99, 5,
+('The Miseducation of Lauryn Hill', 'Lauryn Hill', 'Neo-Soul', 1998, 'Ruffhouse', 30.99, 0,
 'https://upload.wikimedia.org/wikipedia/en/9/99/The_Miseducation_of_Lauryn_Hill.png',
 'Seul album studio de Lauryn Hill, mêlant soul, R&B et reggae. Lauréat de plusieurs Grammy Awards, il est considéré comme un classique du genre.'),
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api")
 public class OrderController {
 
     @Autowired
@@ -22,8 +22,8 @@ public class OrderController {
         return ResponseEntity.ok(orderService.cart(req));
     }
 
-    @GetMapping("/orders/{email}")
-    public ResponseEntity<List<OrderDto>> getOrdersByCustomerEmail(@PathVariable String email) {
+    @GetMapping("/orders") // Add for example ?email=alice@example.com
+    public ResponseEntity<List<OrderDto>> getOrdersByCustomerEmail(@RequestParam String email) {
         return ResponseEntity.ok(orderService.orderListByEmail(email));
     }
 

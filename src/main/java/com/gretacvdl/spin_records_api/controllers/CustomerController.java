@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/customers")
 public class CustomerController {
 
     @Autowired
@@ -26,8 +26,8 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.findById(id));
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<CustomerDto> getCustomerByEmail(@PathVariable String email) {
+    @GetMapping("/email")
+    public ResponseEntity<CustomerDto> getCustomerByEmail(@RequestParam String email) {
         return ResponseEntity.ok(customerService.findByEmail(email));
     }
 
